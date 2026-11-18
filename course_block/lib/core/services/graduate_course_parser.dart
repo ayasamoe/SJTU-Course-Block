@@ -55,6 +55,7 @@ class GraduateCourseParser {
           courseName;
       final courseId =
           _stringOf(row['KCDM']) ?? _stringOf(row['BJDM']) ?? classId;
+      final credit = _creditOf(row);
       final defaultRoom =
           _stringOf(row['PKDD']) ??
           _stringOf(row['PKDD_DISPLAY']) ??
@@ -87,11 +88,13 @@ class GraduateCourseParser {
               courseName: courseName,
               teacher: teacher,
               classRoom: room,
+              credit: credit,
               dayOfWeek: segment.dayOfWeek,
               startNode: segment.startNode,
               endNode: segment.endNode,
             );
         accumulator.addWeekCode(segment.weekCode);
+        accumulator.addCredit(credit);
         accumulators[key] = accumulator;
       }
     }
@@ -309,6 +312,14 @@ class GraduateCourseParser {
     }
     return trimmed;
   }
+
+  double? _creditOf(Map<String, dynamic> row) {
+    for (final key in const ['XF', 'KCXF', 'XF_DISPLAY', 'KCFX']) {
+      final credit = Course.parseCredit(row[key]);
+      if (credit != null) return credit;
+    }
+    return null;
+  }
 }
 
 class _GraduateScheduleSegment {
@@ -333,6 +344,7 @@ class _GraduateCourseAccumulator {
     required this.courseName,
     required this.teacher,
     required this.classRoom,
+    required this.credit,
     required this.dayOfWeek,
     required this.startNode,
     required this.endNode,
@@ -342,6 +354,7 @@ class _GraduateCourseAccumulator {
   final String courseName;
   final String teacher;
   final String classRoom;
+  double? credit;
   final int dayOfWeek;
   final int startNode;
   final int endNode;
@@ -354,6 +367,10 @@ class _GraduateCourseAccumulator {
         _weekFlags[i] = true;
       }
     }
+  }
+
+  void addCredit(double? value) {
+    credit ??= value;
   }
 
   Course? toCourse(AppCourseColorPalette courseColorPalette) {
@@ -381,6 +398,7 @@ class _GraduateCourseAccumulator {
       courseName: courseName,
       teacher: teacher,
       classRoom: classRoom,
+      credit: credit,
       startWeek: firstWeek + 1,
       endWeek: lastWeek + 1,
       dayOfWeek: dayOfWeek,

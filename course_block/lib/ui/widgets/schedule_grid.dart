@@ -512,6 +512,13 @@ class ScheduleGrid extends StatelessWidget {
                         value: course.teacher.isEmpty ? '未填写' : course.teacher,
                         iconColor: sheetTheme.colorScheme.secondary,
                       ),
+                      if (course.credit != null)
+                        _CourseDetailRow(
+                          icon: Icons.workspace_premium_outlined,
+                          label: '学分',
+                          value: _formatCourseCredit(course.credit!),
+                          iconColor: sheetTheme.colorScheme.secondary,
+                        ),
                       if (course.courseId.isNotEmpty)
                         _CourseDetailRow(
                           icon: Icons.tag_rounded,
@@ -664,6 +671,13 @@ class ScheduleGrid extends StatelessWidget {
       return '$base · 双周';
     }
     return base;
+  }
+
+  String _formatCourseCredit(double credit) {
+    final formatted = credit
+        .toStringAsFixed(2)
+        .replaceFirst(RegExp(r'\.?0+$'), '');
+    return '$formatted 学分';
   }
 }
 

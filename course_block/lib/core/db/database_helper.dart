@@ -24,6 +24,9 @@ class DatabaseHelper {
     'ALTER TABLE courses ADD COLUMN remoteBaseline TEXT',
     'ALTER TABLE courses ADD COLUMN editedFields TEXT',
   ];
+  static const courseCreditMigrationSql = <String>[
+    'ALTER TABLE courses ADD COLUMN credit REAL',
+  ];
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -37,7 +40,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -63,6 +66,7 @@ class DatabaseHelper {
       courseName TEXT NOT NULL,
       teacher TEXT,
       classRoom TEXT,
+      credit REAL,
       startWeek INTEGER NOT NULL,
       endWeek INTEGER NOT NULL,
       dayOfWeek INTEGER NOT NULL,
@@ -85,6 +89,11 @@ class DatabaseHelper {
   Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       for (final statement in courseProvenanceMigrationSql) {
+        await db.execute(statement);
+      }
+    }
+    if (oldVersion < 3) {
+      for (final statement in courseCreditMigrationSql) {
         await db.execute(statement);
       }
     }

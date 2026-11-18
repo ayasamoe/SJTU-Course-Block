@@ -208,4 +208,43 @@ void main() {
       expect(cancellations, 0);
     },
   );
+
+  test(
+    'course credits are parsed from undergraduate and graduate payloads',
+    () async {
+      final dio = Dio();
+      dio.httpClientAdapter = _Adapter((options, _) async {
+        if (options.uri.host == 'i.sjtu.edu.cn') {
+          return ResponseBody.fromString(
+            '{"kbList":[{"kch":"PHY101","kcmc":"Physics","xm":"Li",'
+            '"cdmc":"A101","jcs":"1-2","zcd":"1-16周","xqj":"1","xf":"3.5"}]}',
+            200,
+          );
+        }
+        return ResponseBody.fromString(
+          '{"code":"0","datas":{"xsjxrwcx":{"rows":['
+          '{"KCDM":"CHEM101","KCMC":"Chemistry","RKJS":"Wang",'
+          '"PKDD":"B202","PKSJDD":"1-16周 星期一[3-4节] B202","XF":"2.0"}]}}}',
+          200,
+        );
+      });
+      final service = CourseService(dio: dio);
+
+      final undergraduate = await service.fetchUndergraduateCourses(
+        '2025',
+        '1',
+        courseColorPalette: AppCourseColorPalette.candyBox,
+      );
+      final graduate = await service.fetchGraduateCourses(
+        '2025',
+        '1',
+        courseColorPalette: AppCourseColorPalette.candyBox,
+      );
+
+      expect(undergraduate.failures, isEmpty);
+      expect(undergraduate.courses.single.credit, 3.5);
+      expect(graduate.failures, isEmpty);
+      expect(graduate.courses.single.credit, 2);
+    },
+  );
 }

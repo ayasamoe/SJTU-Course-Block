@@ -7,6 +7,7 @@ class Course {
   final String courseName;
   final String teacher;
   final String classRoom;
+  final double? credit;
   final int startWeek;
   final int endWeek;
   final int dayOfWeek; // 1-7 (Mon-Sun)
@@ -29,6 +30,7 @@ class Course {
     'courseName',
     'teacher',
     'classRoom',
+    'credit',
     'startWeek',
     'endWeek',
     'dayOfWeek',
@@ -63,6 +65,7 @@ class Course {
     required this.courseName,
     required this.teacher,
     required this.classRoom,
+    this.credit,
     required this.startWeek,
     required this.endWeek,
     required this.dayOfWeek,
@@ -87,6 +90,7 @@ class Course {
       'courseName': courseName,
       'teacher': teacher,
       'classRoom': classRoom,
+      'credit': credit,
       'startWeek': startWeek,
       'endWeek': endWeek,
       'dayOfWeek': dayOfWeek,
@@ -112,6 +116,7 @@ class Course {
       courseName: map['courseName'],
       teacher: map['teacher'],
       classRoom: map['classRoom'],
+      credit: parseCredit(map['credit']),
       startWeek: map['startWeek'],
       endWeek: map['endWeek'],
       dayOfWeek: map['dayOfWeek'],
@@ -136,6 +141,21 @@ class Course {
   Map<String, dynamic> get syncFields {
     final map = toMap();
     return {for (final field in syncFieldNames) field: map[field]};
+  }
+
+  /// Accepts numeric or text values such as `3`, `1.5` and `3.0 学分`.
+  static double? parseCredit(dynamic value) {
+    if (value == null) return null;
+    if (value is num) {
+      final numeric = value.toDouble();
+      return numeric.isFinite && numeric >= 0 ? numeric : null;
+    }
+
+    final text = value.toString().trim().replaceAll('．', '.');
+    if (text.isEmpty || text.toLowerCase() == 'null') return null;
+    final match = RegExp(r'-?\d+(?:\.\d+)?').firstMatch(text);
+    final numeric = double.tryParse(match?.group(0) ?? '');
+    return numeric != null && numeric.isFinite && numeric >= 0 ? numeric : null;
   }
 
   /// Records only fields actually changed by the user, retaining prior overrides.
@@ -210,6 +230,7 @@ class Course {
     String? courseName,
     String? teacher,
     String? classRoom,
+    Object? credit = _unchanged,
     int? startWeek,
     int? endWeek,
     int? dayOfWeek,
@@ -232,6 +253,7 @@ class Course {
       courseName: courseName ?? this.courseName,
       teacher: teacher ?? this.teacher,
       classRoom: classRoom ?? this.classRoom,
+      credit: identical(credit, _unchanged) ? this.credit : credit as double?,
       startWeek: startWeek ?? this.startWeek,
       endWeek: endWeek ?? this.endWeek,
       dayOfWeek: dayOfWeek ?? this.dayOfWeek,
@@ -257,7 +279,7 @@ class Course {
 
   @override
   String toString() {
-    return 'Course{id: $id, name: $courseName, room: $classRoom, day: $dayOfWeek, time: $startNode-$step}';
+    return 'Course{id: $id, name: $courseName, room: $classRoom, credit: $credit, day: $dayOfWeek, time: $startNode-$step}';
   }
 }
 

@@ -709,7 +709,7 @@ void main() {
   });
 
   test(
-    'migration SQL preserves v1 row IDs and adds provenance columns',
+    'migration SQL preserves v1 row IDs and adds sync metadata columns',
     () async {
       if (!Platform.isWindows) return;
       final fixture =
@@ -719,6 +719,7 @@ void main() {
       INSERT INTO schedules VALUES(4, 'keep', '2025', '1', '2025-09-01', 1);
       INSERT INTO courses (id,scheduleId,courseId,courseName) VALUES (19,4,'R','keep');
       ${DatabaseHelper.courseProvenanceMigrationSql.join(';')};
+      ${DatabaseHelper.courseCreditMigrationSql.join(';')};
       INSERT INTO courses (scheduleId,courseId,courseName,sourceSystem,remoteCourseKey,remoteBaseline,editedFields)
         VALUES (4,'R2','new','ug','R2','{"teacher":"remote"}','["teacher"]');
       SELECT id || ':' || scheduleId || ':' || sourceSystem || ':' || courseName FROM courses;
@@ -737,6 +738,7 @@ void main() {
         'remoteCourseKey',
         'remoteBaseline',
         'editedFields',
+        'credit',
       ]) {
         expect(result.stdout, contains('|$field|'));
       }
