@@ -21,6 +21,7 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
   late final TextEditingController _nameController;
   late final TextEditingController _teacherController;
   late final TextEditingController _roomController;
+  late final TextEditingController _creditController;
   late int _dayOfWeek;
   late int _startNode;
   late int _step;
@@ -44,6 +45,11 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
     _roomController = TextEditingController(
       text: widget.course?.classRoom ?? '',
     );
+    _creditController = TextEditingController(
+      text: widget.course == null
+          ? ''
+          : widget.course!.credit.toString().replaceFirst(RegExp(r'\.0$'), ''),
+    );
     _dayOfWeek = widget.course?.dayOfWeek ?? 1;
     _startNode = widget.course?.startNode ?? 1;
     _step = widget.course?.step ?? 2;
@@ -62,6 +68,7 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
     _nameController.dispose();
     _teacherController.dispose();
     _roomController.dispose();
+    _creditController.dispose();
     super.dispose();
   }
 
@@ -156,7 +163,7 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '设置课程名称、时间和周次。',
+                            '设置课程名称、学分、时间和周次。',
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                               height: 1.45,
@@ -207,6 +214,26 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
                 TextFormField(
                   controller: _roomController,
                   decoration: const InputDecoration(hintText: '可不填'),
+                ),
+                const SizedBox(height: 14),
+                _FieldLabel(
+                  icon: Icons.workspace_premium_outlined,
+                  color: theme.colorScheme.secondaryContainer,
+                  text: '课程学分',
+                ),
+                TextFormField(
+                  controller: _creditController,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  decoration: const InputDecoration(hintText: '请输入课程学分'),
+                  validator: (value) {
+                    final credit = Course.parseCredit(value);
+                    if (credit == null || credit <= 0) {
+                      return '请输入大于0的课程学分';
+                    }
+                    return null;
+                  },
                 ),
               ],
             ),
@@ -411,6 +438,7 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
     final provider = context.read<CourseProvider>();
     final scheduleId = provider.currentSchedule?.id;
     final colorValue = _resolvedColorValue(provider);
+    final credit = Course.parseCredit(_creditController.text)!;
     final original = widget.course;
     final course = original == null
         ? Course(
@@ -419,6 +447,7 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
             courseName: _nameController.text.trim(),
             teacher: _teacherController.text.trim(),
             classRoom: _roomController.text.trim(),
+            credit: credit,
             dayOfWeek: _dayOfWeek,
             startNode: _startNode,
             step: _step,
@@ -431,6 +460,7 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
             courseName: _nameController.text.trim(),
             teacher: _teacherController.text.trim(),
             classRoom: _roomController.text.trim(),
+            credit: credit,
             dayOfWeek: _dayOfWeek,
             startNode: _startNode,
             step: _step,

@@ -1,7 +1,7 @@
 import 'package:course_block/core/models/course.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Course _course({double? credit}) => Course(
+Course _course({double credit = 2.5}) => Course(
   courseId: 'CS101',
   courseName: 'Programming',
   teacher: 'Teacher',
@@ -30,6 +30,7 @@ void main() {
     expect(restored.credit, 2.5);
     expect(restored.syncFields['credit'], 2.5);
     expect(restored.copyWith().credit, 2.5);
-    expect(restored.copyWith(credit: null).credit, isNull);
+    expect(restored.copyWith(credit: 3).credit, 3);
+    expect(Course.fromMap({...original.toMap(), 'credit': null}).credit, 0);
   });
 }

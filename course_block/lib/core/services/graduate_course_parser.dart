@@ -398,7 +398,7 @@ class _GraduateCourseAccumulator {
       courseName: courseName,
       teacher: teacher,
       classRoom: classRoom,
-      credit: credit,
+      credit: credit ?? 0,
       startWeek: firstWeek + 1,
       endWeek: lastWeek + 1,
       dayOfWeek: dayOfWeek,

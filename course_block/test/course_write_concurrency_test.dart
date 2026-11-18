@@ -21,6 +21,7 @@ Course _course({String teacher = 'Original', String color = '#FF5722'}) =>
       courseName: 'Algebra',
       teacher: teacher,
       classRoom: 'A101',
+      credit: 3,
       startWeek: 1,
       endWeek: 16,
       dayOfWeek: 1,

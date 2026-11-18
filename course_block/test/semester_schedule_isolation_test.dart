@@ -37,6 +37,7 @@ Course _course(String name, {String courseId = 'R'}) => Course(
   courseName: name,
   teacher: 'Teacher',
   classRoom: 'A101',
+  credit: 3,
   startWeek: 1,
   endWeek: 16,
   dayOfWeek: 1,

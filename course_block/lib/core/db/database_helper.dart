@@ -25,7 +25,7 @@ class DatabaseHelper {
     'ALTER TABLE courses ADD COLUMN editedFields TEXT',
   ];
   static const courseCreditMigrationSql = <String>[
-    'ALTER TABLE courses ADD COLUMN credit REAL',
+    'ALTER TABLE courses ADD COLUMN credit REAL NOT NULL DEFAULT(0)',
   ];
 
   Future<Database> get database async {
@@ -66,7 +66,7 @@ class DatabaseHelper {
       courseName TEXT NOT NULL,
       teacher TEXT,
       classRoom TEXT,
-      credit REAL,
+ credit REAL NOT NULL DEFAULT(0),
       startWeek INTEGER NOT NULL,
       endWeek INTEGER NOT NULL,
       dayOfWeek INTEGER NOT NULL,

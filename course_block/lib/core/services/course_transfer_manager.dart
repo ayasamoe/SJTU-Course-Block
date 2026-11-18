@@ -472,6 +472,7 @@ class CourseTransferManager {
           courseName: name,
           teacher: '',
           classRoom: _unescapeIcsText(field('LOCATION') ?? ''),
+          credit: Course.parseCredit(field('X-COURSE-BLOCK-CREDIT')) ?? 0,
           startWeek: weeks.first,
           endWeek: weeks.last,
           dayOfWeek: start.weekday,
@@ -511,6 +512,7 @@ class CourseTransferManager {
       buffer.writeln('BEGIN:VEVENT');
       buffer.writeln('SUMMARY:${_escapeIcsText(course.courseName)}');
       buffer.writeln('LOCATION:${_escapeIcsText(course.classRoom)}');
+      buffer.writeln('X-COURSE-BLOCK-CREDIT:${course.credit}');
       buffer.writeln('DTSTART;TZID=Asia/Shanghai:${_formatIcsDateTime(start)}');
       buffer.writeln('DTEND;TZID=Asia/Shanghai:${_formatIcsDateTime(end)}');
       if (interval != null) {

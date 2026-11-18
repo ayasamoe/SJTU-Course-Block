@@ -13,6 +13,7 @@ Course course({
   courseName: 'Math',
   teacher: '',
   classRoom: '',
+  credit: 3,
   startWeek: startWeek,
   endWeek: endWeek,
   dayOfWeek: 3,

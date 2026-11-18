@@ -26,6 +26,7 @@ Course _course(
   courseName: name,
   teacher: 'Professor',
   classRoom: 'A101',
+  credit: 3,
   startWeek: 1,
   endWeek: 16,
   dayOfWeek: day,

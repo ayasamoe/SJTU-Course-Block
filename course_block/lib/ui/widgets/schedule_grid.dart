@@ -512,13 +512,12 @@ class ScheduleGrid extends StatelessWidget {
                         value: course.teacher.isEmpty ? '未填写' : course.teacher,
                         iconColor: sheetTheme.colorScheme.secondary,
                       ),
-                      if (course.credit != null)
-                        _CourseDetailRow(
-                          icon: Icons.workspace_premium_outlined,
-                          label: '学分',
-                          value: _formatCourseCredit(course.credit!),
-                          iconColor: sheetTheme.colorScheme.secondary,
-                        ),
+                      _CourseDetailRow(
+                        icon: Icons.workspace_premium_outlined,
+                        label: '学分',
+                        value: _formatCourseCredit(course.credit),
+                        iconColor: sheetTheme.colorScheme.secondary,
+                      ),
                       if (course.courseId.isNotEmpty)
                         _CourseDetailRow(
                           icon: Icons.tag_rounded,
@@ -905,7 +904,11 @@ class _CourseCardPainter extends CustomPainter {
         // outlineText mode: draw a thin stroke underneath the fill, matching
         // the old _outlinedText two-pass Stack.
         if (outlineText) {
-          final TextPainter stroke = _layoutLine(lines[i], innerWidth, stroke: true);
+          final TextPainter stroke = _layoutLine(
+            lines[i],
+            innerWidth,
+            stroke: true,
+          );
           stroke.paint(canvas, offset);
         }
         tp.paint(canvas, offset);
@@ -916,7 +919,11 @@ class _CourseCardPainter extends CustomPainter {
     }
   }
 
-  TextPainter _layoutLine(_CardLine line, double maxWidth, {bool stroke = false}) {
+  TextPainter _layoutLine(
+    _CardLine line,
+    double maxWidth, {
+    bool stroke = false,
+  }) {
     final Color textColor = line.color ?? Colors.white;
     final TextStyle style = stroke
         ? TextStyle(

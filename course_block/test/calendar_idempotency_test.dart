@@ -24,6 +24,7 @@ Course _course({
   courseName: 'Math',
   teacher: 'Tutor',
   classRoom: room,
+  credit: 3,
   startWeek: 1,
   endWeek: 8,
   dayOfWeek: 3,

@@ -13,6 +13,7 @@ Course _course(String name, int weekday, int firstWeek, int lastWeek) => Course(
   courseName: name,
   teacher: '',
   classRoom: '',
+  credit: 3,
   startWeek: firstWeek,
   endWeek: lastWeek,
   dayOfWeek: weekday,

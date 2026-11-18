@@ -7,7 +7,7 @@ class Course {
   final String courseName;
   final String teacher;
   final String classRoom;
-  final double? credit;
+  final double credit;
   final int startWeek;
   final int endWeek;
   final int dayOfWeek; // 1-7 (Mon-Sun)
@@ -65,7 +65,7 @@ class Course {
     required this.courseName,
     required this.teacher,
     required this.classRoom,
-    this.credit,
+    required this.credit,
     required this.startWeek,
     required this.endWeek,
     required this.dayOfWeek,
@@ -116,7 +116,7 @@ class Course {
       courseName: map['courseName'],
       teacher: map['teacher'],
       classRoom: map['classRoom'],
-      credit: parseCredit(map['credit']),
+      credit: parseCredit(map['credit']) ?? 0,
       startWeek: map['startWeek'],
       endWeek: map['endWeek'],
       dayOfWeek: map['dayOfWeek'],
@@ -230,7 +230,7 @@ class Course {
     String? courseName,
     String? teacher,
     String? classRoom,
-    Object? credit = _unchanged,
+    double? credit,
     int? startWeek,
     int? endWeek,
     int? dayOfWeek,
@@ -253,7 +253,7 @@ class Course {
       courseName: courseName ?? this.courseName,
       teacher: teacher ?? this.teacher,
       classRoom: classRoom ?? this.classRoom,
-      credit: identical(credit, _unchanged) ? this.credit : credit as double?,
+      credit: credit ?? this.credit,
       startWeek: startWeek ?? this.startWeek,
       endWeek: endWeek ?? this.endWeek,
       dayOfWeek: dayOfWeek ?? this.dayOfWeek,

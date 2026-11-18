@@ -228,6 +228,7 @@ void main() {
                   courseName: 'Sample',
                   teacher: '',
                   classRoom: '',
+                  credit: 3,
                   startWeek: 1,
                   endWeek: 1,
                   dayOfWeek: 1,

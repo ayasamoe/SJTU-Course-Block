@@ -25,6 +25,7 @@ Course _course({String id = 'R', String teacher = 'Original'}) => Course(
   courseName: 'Algebra',
   teacher: teacher,
   classRoom: 'A101',
+  credit: 3,
   startWeek: 1,
   endWeek: 16,
   dayOfWeek: 1,

@@ -320,7 +320,7 @@ class CourseService {
       courseName: json['kcmc'] as String? ?? '未知课程',
       teacher: json['xm'] as String? ?? '未知教师',
       classRoom: json['cdmc'] as String? ?? '未知地点',
-      credit: Course.parseCredit(json['xf'] ?? json['xdfscore']),
+      credit: Course.parseCredit(json['xf'] ?? json['xdfscore']) ?? 0,
       startWeek: startWeek,
       endWeek: endWeek,
       dayOfWeek: json['xqj'] is int

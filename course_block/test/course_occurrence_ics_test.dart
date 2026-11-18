@@ -25,6 +25,7 @@ Course _course({
   courseName: 'Math',
   teacher: 'Tutor',
   classRoom: 'A101',
+  credit: 3,
   startWeek: startWeek,
   endWeek: endWeek,
   dayOfWeek: 3,
@@ -159,10 +160,12 @@ END:VCALENDAR''', _semesterStart)).single;
       final ics = await export(original, _semesterStart);
       expect(ics, contains('DTSTART;TZID=Asia/Shanghai:20260311T080000'));
       expect(ics, contains('RRULE:FREQ=WEEKLY;INTERVAL=1;COUNT=4'));
+      expect(ics, contains('X-COURSE-BLOCK-CREDIT:3'));
       final imported = (await importedCourses(ics, _semesterStart)).single;
       expect(courseOccurrenceWeeks(imported), courseOccurrenceWeeks(original));
       expect(imported.startNode, original.startNode);
       expect(imported.step, original.step);
+      expect(imported.credit, original.credit);
     },
   );
 

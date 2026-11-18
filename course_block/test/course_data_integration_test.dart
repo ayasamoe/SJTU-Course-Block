@@ -18,6 +18,7 @@ Course _course(String courseId) => Course(
   courseName: 'Calculus',
   teacher: 'Professor',
   classRoom: 'A101',
+  credit: 3,
   startWeek: 1,
   endWeek: 8,
   dayOfWeek: 3,
