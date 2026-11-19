@@ -10,6 +10,7 @@ import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.RemoteViews
 import com.labyrinth.course_block.MainActivity
 import com.labyrinth.course_block.R
@@ -148,13 +149,10 @@ class UpcomingWidgetProvider : AppWidgetProvider() {
 
         views.setTextViewText(R.id.lbl_today, "今天")
         views.setTextViewText(R.id.lbl_tmr, "明天")
-        views.setTextColor(R.id.lbl_today, theme.headerText)
-        views.setTextColor(R.id.lbl_tmr, theme.subtitleText)
-        views.setTextColor(R.id.btn_refresh, theme.accent)
-        views.setTextColor(R.id.btn_open, theme.openText)
+        views.setTextColor(R.id.lbl_today, theme.accent)
+        views.setTextColor(R.id.lbl_tmr, theme.accent)
         views.setInt(R.id.divider_top, "setBackgroundColor", theme.divider)
         views.setInt(R.id.divider_center, "setBackgroundColor", theme.divider)
-        views.setInt(R.id.divider_bottom, "setBackgroundColor", theme.divider)
 
         views.removeAllViews(R.id.col_today_content)
         views.removeAllViews(R.id.col_tmr_content)
@@ -178,12 +176,10 @@ class UpcomingWidgetProvider : AppWidgetProvider() {
         )
 
         views.setOnClickPendingIntent(
-            R.id.btn_refresh,
+            R.id.tv_header,
             refreshPendingIntent(context, widgetId),
         )
-        val openIntent = openPendingIntent(context)
-        views.setOnClickPendingIntent(R.id.btn_open, openIntent)
-        views.setOnClickPendingIntent(R.id.widget_root, openIntent)
+        views.setOnClickPendingIntent(R.id.widget_root, openPendingIntent(context))
 
         appWidgetManager.updateAppWidget(widgetId, views)
     }
@@ -240,31 +236,41 @@ class UpcomingWidgetProvider : AppWidgetProvider() {
         courses: List<CourseRow>,
     ) {
         if (courses.isEmpty()) {
-            val card = RemoteViews(context.packageName, R.layout.widget_mini_card)
-            card.setTextViewText(R.id.mini_name, "暂无课程")
-            card.setTextViewText(R.id.mini_info, "")
-            card.setTextColor(R.id.mini_name, theme.emptyText)
-            card.setTextColor(R.id.mini_info, theme.courseDetail)
+            val card = RemoteViews(context.packageName, R.layout.widget_course_row)
+            card.setTextViewText(R.id.row_title, "暂无课程")
+            card.setTextColor(R.id.row_title, theme.emptyText)
             card.setInt(
-                R.id.mini_bar,
+                R.id.row_bar,
                 "setBackgroundColor",
                 WidgetColors.withAlpha(theme.emptyText, 180),
             )
+            card.setViewVisibility(R.id.row_detail, View.GONE)
+            card.setViewVisibility(R.id.row_time, View.GONE)
             views.addView(columnId, card)
             return
         }
 
         for (course in courses) {
-            val card = RemoteViews(context.packageName, R.layout.widget_mini_card)
+            val card = RemoteViews(context.packageName, R.layout.widget_course_row)
             val color = WidgetColors.forCourse(course.name, theme, course.color)
-            val details = listOf(course.room, course.timeRange)
-                .filter { it.isNotEmpty() }
-                .joinToString(" ")
-            card.setTextViewText(R.id.mini_name, course.name)
-            card.setTextViewText(R.id.mini_info, details)
-            card.setTextColor(R.id.mini_name, theme.courseTitle)
-            card.setTextColor(R.id.mini_info, color)
-            card.setInt(R.id.mini_bar, "setBackgroundColor", color)
+            card.setTextViewText(R.id.row_title, course.name)
+            card.setTextViewText(
+                R.id.row_detail,
+                if (course.room.isNotEmpty()) "地点：${course.room}" else "",
+            )
+            card.setTextViewText(R.id.row_time, course.timeRange)
+            card.setTextColor(R.id.row_title, theme.courseTitle)
+            card.setTextColor(R.id.row_detail, theme.courseDetail)
+            card.setTextColor(R.id.row_time, color)
+            card.setInt(R.id.row_bar, "setBackgroundColor", color)
+            card.setViewVisibility(
+                R.id.row_detail,
+                if (course.room.isEmpty()) View.GONE else View.VISIBLE,
+            )
+            card.setViewVisibility(
+                R.id.row_time,
+                if (course.timeRange.isEmpty()) View.GONE else View.VISIBLE,
+            )
             views.addView(columnId, card)
         }
     }
