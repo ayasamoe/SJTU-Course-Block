@@ -128,6 +128,19 @@ class UpcomingWidgetProvider : AppWidgetProvider() {
         val views = RemoteViews(context.packageName, R.layout.widget_upcoming_wide)
         applyHeader(views, prefs, theme)
         views.setInt(R.id.divider_top, "setBackgroundColor", theme.divider)
+        views.setTextViewText(
+            R.id.wide_header_today,
+            prefs.getString("upcoming_today_label", "").orEmpty().ifBlank { "今天" },
+        )
+        views.setTextViewText(
+            R.id.wide_header_tomorrow,
+            prefs.getString("upcoming_tomorrow_label", "").orEmpty().ifBlank { "明天" },
+        )
+        views.setTextColor(R.id.wide_header_today, theme.accent)
+        views.setTextColor(R.id.wide_header_tomorrow, theme.accent)
+        views.setInt(R.id.wide_header_column_divider, "setBackgroundColor", theme.divider)
+        views.setInt(R.id.wide_header_underline, "setBackgroundColor", theme.divider)
+        views.setInt(R.id.wide_center_divider, "setBackgroundColor", theme.divider)
 
         val serviceIntent =
             Intent(context, UpcomingWideWidgetService::class.java).apply {

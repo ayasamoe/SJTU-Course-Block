@@ -9,7 +9,7 @@ import android.widget.RemoteViewsService
 import com.labyrinth.course_block.R
 import org.json.JSONArray
 
-/** 双列布局使用一个 ListView：首行是两侧日期标题，之后每行是一对课程。 两列共享同一个滚动位置，和单列布局一样只依赖 RemoteViews支持的标准控件。 */
+/** 双列布局使用一个 ListView，每行是一对课程。 两列共享同一个滚动位置，和单列布局一样只依赖 RemoteViews支持的标准控件。 */
 internal class UpcomingWideWidgetFactory(private val context: Context) :
     RemoteViewsService.RemoteViewsFactory {
 
@@ -20,18 +20,14 @@ internal class UpcomingWideWidgetFactory(private val context: Context) :
         val color: String,
     )
 
-    private sealed class Row {
-        data class Header(val todayLabel: String, val tomorrowLabel: String) : Row()
+    private data class PairRow(
+        val left: Course?,
+        val right: Course?,
+        val showLeftPlaceholder: Boolean,
+        val showRightPlaceholder: Boolean,
+    )
 
-        data class Pair(
-            val left: Course?,
-            val right: Course?,
-            val showLeftPlaceholder: Boolean,
-            val showRightPlaceholder: Boolean,
-        ) : Row()
-    }
-
-    private var rows: List<Row> = emptyList()
+    private var rows: List<PairRow> = emptyList()
     private lateinit var theme: WidgetColors.WidgetTheme
 
     override fun onCreate() {
@@ -49,16 +45,20 @@ internal class UpcomingWideWidgetFactory(private val context: Context) :
     override fun getCount(): Int = rows.size
 
     override fun getViewAt(position: Int): RemoteViews {
-        return when (val row = rows.getOrNull(position)) {
-            is Row.Header -> headerView(row)
-            is Row.Pair -> pairView(row)
-            null -> headerView(Row.Header("今天", "明天"))
-        }
+        return pairView(
+            rows.getOrNull(position)
+                ?: PairRow(
+                    left = null,
+                    right = null,
+                    showLeftPlaceholder = true,
+                    showRightPlaceholder = true,
+                )
+        )
     }
 
     override fun getLoadingView(): RemoteViews? = null
 
-    override fun getViewTypeCount(): Int = 2
+    override fun getViewTypeCount(): Int = 1
 
     override fun getItemId(position: Int): Long = position.toLong()
 
@@ -100,29 +100,17 @@ internal class UpcomingWideWidgetFactory(private val context: Context) :
             groups.clear()
         }
 
-        val todayEntry = groups.entries.firstOrNull { it.key.startsWith("今天") }
-        val tomorrowEntry = groups.entries.firstOrNull { it.key.startsWith("明天") }
-        val todayLabel =
-            prefs.getString("upcoming_today_label", "").orEmpty().ifBlank {
-                todayEntry?.key?.ifBlank { "今天" } ?: "今天"
-            }
-        val tomorrowLabel =
-            prefs.getString("upcoming_tomorrow_label", "").orEmpty().ifBlank {
-                tomorrowEntry?.key?.ifBlank { "明天" } ?: "明天"
-            }
-        val todayCourses = todayEntry?.value.orEmpty()
-        val tomorrowCourses = tomorrowEntry?.value.orEmpty()
+        val todayCourses = groups.entries.firstOrNull { it.key.startsWith("今天") }?.value.orEmpty()
+        val tomorrowCourses =
+            groups.entries.firstOrNull { it.key.startsWith("明天") }?.value.orEmpty()
         val pairCount = maxOf(todayCourses.size, tomorrowCourses.size).coerceAtLeast(1)
 
         rows = buildList {
-            add(Row.Header(todayLabel, tomorrowLabel))
             repeat(pairCount) { index ->
-                val left = todayCourses.getOrNull(index)
-                val right = tomorrowCourses.getOrNull(index)
                 add(
-                    Row.Pair(
-                        left = left,
-                        right = right,
+                    PairRow(
+                        left = todayCourses.getOrNull(index),
+                        right = tomorrowCourses.getOrNull(index),
                         showLeftPlaceholder = index == 0 && todayCourses.isEmpty(),
                         showRightPlaceholder = index == 0 && tomorrowCourses.isEmpty(),
                     )
@@ -131,19 +119,8 @@ internal class UpcomingWideWidgetFactory(private val context: Context) :
         }
     }
 
-    private fun headerView(row: Row.Header): RemoteViews {
-        val views = RemoteViews(context.packageName, R.layout.widget_upcoming_wide_header_row)
-        views.setTextViewText(R.id.wide_header_today, row.todayLabel)
-        views.setTextViewText(R.id.wide_header_tomorrow, row.tomorrowLabel)
-        views.setTextColor(R.id.wide_header_today, theme.accent)
-        views.setTextColor(R.id.wide_header_tomorrow, theme.accent)
-        views.setInt(R.id.wide_header_divider, "setBackgroundColor", theme.divider)
-        return views
-    }
-
-    private fun pairView(row: Row.Pair): RemoteViews {
+    private fun pairView(row: PairRow): RemoteViews {
         val views = RemoteViews(context.packageName, R.layout.widget_upcoming_wide_pair_row)
-        views.setInt(R.id.wide_pair_divider, "setBackgroundColor", theme.divider)
         bindCourse(
             views = views,
             course = row.left,
